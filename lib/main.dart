@@ -91,7 +91,7 @@ class _MineState extends State<Mine> {
     _reveal(coords.x, coords.y);
     setState(() {});
     if (aiEnabled) {
-      Timer(Duration(milliseconds: 10), _aiMove);
+      Timer(const Duration(milliseconds: 10), _aiMove);
     }
   }
 
