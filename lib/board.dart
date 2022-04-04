@@ -7,7 +7,7 @@ class Coords {
 }
 
 class Board {
-  int height = 0, width = 0, mines = 0;
+  int height = 0, width = 0, mines = 0, flags = 0;
   bool firstMove = true;
   List<List<bool>> _board = [];
   List<List<int>> revealed = [];

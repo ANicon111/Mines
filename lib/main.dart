@@ -31,10 +31,10 @@ class Mine extends StatefulWidget {
 
 class _MineState extends State<Mine> {
   FocusNode focusNode = FocusNode();
-  int width = 12;
-  int height = 8;
-  int mines = 15;
-  Board board = Board(12, 8, 15);
+  int width = 30;
+  int height = 16;
+  int mines = 99;
+  Board board = Board(30, 16, 99);
   bool gameOver = false;
   bool initd = false;
   bool aiEnabled = false;
@@ -86,23 +86,22 @@ class _MineState extends State<Mine> {
     }
   }
 
-  void _aiMove() async {
+  void _aiMove() {
     Coords coords = AI(board).getBestMove();
     _reveal(coords.x, coords.y);
     setState(() {});
-    if (aiEnabled) {
-      Timer(const Duration(milliseconds: 10), _aiMove);
-    }
+    if (aiEnabled) Timer(const Duration(milliseconds: 10), _aiMove);
   }
 
   void _toggleAI() {
-    aiEnabled = !aiEnabled;
+    aiEnabled != aiEnabled;
     if (aiEnabled) _aiMove();
   }
 
   void _toggleFlag(int x, int y) {
     if (board.revealed[x][y] == -2 || board.revealed[x][y] == -3) {
       setState(() {
+        board.flags += board.revealed[x][y] == -2 ? 1 : -1;
         board.revealed[x][y] = board.revealed[x][y] == -2 ? -3 : -2;
       });
     }
@@ -176,6 +175,7 @@ class _MineState extends State<Mine> {
               ),
             ),
           ),
+          Text((board.mines - board.flags).toString()),
         ],
       ),
     );
