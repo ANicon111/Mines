@@ -7,7 +7,7 @@ class Coords {
 }
 
 class Board {
-  int height = 0, width = 0, mines = 0, flags = 0;
+  int height = 0, width = 0, mines = 0, flags = 0, remaining = 0;
   bool firstMove = true;
   List<List<bool>> _board = [];
   List<List<int>> revealed = [];
@@ -17,6 +17,7 @@ class Board {
   }
 
   Board(this.width, this.height, this.mines) {
+    remaining = width * height;
     _board = List.generate(height, (_) => List.generate(width, (_) => false));
     revealed = List.generate(height, (_) => List.generate(width, (_) => -2));
   }
@@ -37,7 +38,7 @@ class Board {
       int val = randomCoord.nextInt(mines + nonMines);
       for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
-          if (isPosValid(safeX + i, safeX + j) &&
+          if (isPosValid(safeX + i, safeY + j) &&
               pos == (safeY + j) * height + safeX + i) {
             nonMines--;
             _board[pos % height][pos ~/ height] = false;
@@ -75,6 +76,7 @@ class Board {
 
   int val(int x, int y) {
     int val = _val(x, y);
+    if (revealed[x][y] == -2) remaining--;
     revealed[x][y] = val;
     firstMove = false;
     return val;

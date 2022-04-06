@@ -5,7 +5,7 @@ import 'package:minesweeper/board.dart';
 class AI {
   List<List<double>> moves = [];
   Board board;
-  final unknownK = 0.0099;
+  double unknownK = 0.099;
   final closenessK = 0.9;
 
   void _update(int x, int y) {

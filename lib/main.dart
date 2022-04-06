@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:minesweeper/ai.dart';
 import 'package:minesweeper/board.dart';
 import 'package:minesweeper/definitions.dart';
@@ -38,6 +39,7 @@ class _MineState extends State<Mine> {
   bool gameOver = false;
   bool initd = false;
   bool aiEnabled = false;
+  bool settingsOpen = false;
 
   @override
   void initState() {
@@ -94,7 +96,7 @@ class _MineState extends State<Mine> {
   }
 
   void _toggleAI() {
-    aiEnabled != aiEnabled;
+    aiEnabled = !aiEnabled;
     if (aiEnabled) _aiMove();
   }
 
@@ -112,72 +114,182 @@ class _MineState extends State<Mine> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Minesweeper"),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          GridView.count(
-              childAspectRatio: 1,
-              shrinkWrap: true,
-              primary: false,
-              padding: const EdgeInsets.all(20),
-              crossAxisSpacing: RelSize(context).pixel(),
-              mainAxisSpacing: RelSize(context).pixel(),
-              crossAxisCount: width,
-              children: List.generate(
-                  width * height,
-                  (index) => Cell(
-                      reveal: _reveal,
-                      value: board.revealed[index ~/ width][index % width],
-                      toggleFlag: _toggleFlag,
-                      x: index ~/ width,
-                      y: index % width))),
-          Padding(
-            padding: EdgeInsets.all(8.0 * RelSize(context).pixel()),
-            child: Ink(
-              height: 120 * RelSize(context).pixel(),
-              width: 480 * RelSize(context).pixel(),
-              color: Colors.grey.shade700,
-              child: InkWell(
-                hoverColor: Colors.grey,
-                mouseCursor: SystemMouseCursors.click,
-                onTap: _reset,
-                child: Center(
-                  child: Text(
-                    "Play Again",
-                    style: TextStyle(
-                      fontSize: 80 * RelSize(context).pixel(),
-                    ),
-                  ),
+        actions: [
+          settingsOpen
+              ? IconButton(
+                  onPressed: () {
+                    if (width != board.width ||
+                        height != board.height ||
+                        mines != board.mines) _reset();
+                    setState(() {
+                      settingsOpen = false;
+                    });
+                  },
+                  icon: const Icon(Icons.close),
+                )
+              : IconButton(
+                  onPressed: () {
+                    setState(() {
+                      settingsOpen = true;
+                    });
+                  },
+                  icon: const Icon(Icons.settings),
                 ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0 * RelSize(context).pixel()),
-            child: Ink(
-              height: 120 * RelSize(context).pixel(),
-              width: 480 * RelSize(context).pixel(),
-              color: Colors.grey.shade700,
-              child: InkWell(
-                hoverColor: Colors.grey,
-                mouseCursor: SystemMouseCursors.click,
-                onTap: _toggleAI,
-                child: Center(
-                  child: Text(
-                    "AI Move",
-                    style: TextStyle(
-                      fontSize: 80 * RelSize(context).pixel(),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Text((board.mines - board.flags).toString()),
         ],
       ),
+      body: settingsOpen
+          ? Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 100 * RelSize(context).pixel(),
+                    child: TextFormField(
+                      decoration: const InputDecoration(label: Text("Width:")),
+                      onChanged: (val) {
+                        setState(() {
+                          width = int.tryParse(val) ?? width;
+                        });
+                      },
+                      initialValue: width.toString(),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 100 * RelSize(context).pixel(),
+                    child: TextFormField(
+                      decoration: const InputDecoration(label: Text("Height:")),
+                      onChanged: (val) {
+                        setState(() {
+                          height = int.tryParse(val) ?? height;
+                        });
+                      },
+                      initialValue: height.toString(),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 100 * RelSize(context).pixel(),
+                    child: TextFormField(
+                      decoration: const InputDecoration(label: Text("Mines:")),
+                      onChanged: (val) {
+                        setState(() {
+                          mines = int.tryParse(val) ?? mines;
+                        });
+                      },
+                      initialValue: mines.toString(),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.flag,
+                      size: 50 * RelSize(context).pixel(),
+                    ),
+                    Text(
+                      (board.mines - board.flags).toString(),
+                      style: TextStyle(fontSize: 50 * RelSize(context).pixel()),
+                    ),
+                    Icon(
+                      Icons.square,
+                      size: 50 * RelSize(context).pixel(),
+                      color: Colors.grey,
+                    ),
+                    Text(
+                      (board.remaining - (board.flags > 0 ? board.flags : 0))
+                          .toString(),
+                      style: TextStyle(fontSize: 50 * RelSize(context).pixel()),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: List.generate(
+                    height,
+                    (x) => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        width,
+                        (y) => Cell(
+                          size: RelSize(context).pixel() *
+                              640 /
+                              (width > height ? width : height),
+                          reveal: _reveal,
+                          value: board.revealed[x][y],
+                          toggleFlag: _toggleFlag,
+                          x: x,
+                          y: y,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(8.0 * RelSize(context).pixel()),
+                      child: Ink(
+                        height: 100 * RelSize(context).pixel(),
+                        width: 300 * RelSize(context).pixel(),
+                        color: Colors.grey.shade700,
+                        child: InkWell(
+                          hoverColor: Colors.grey,
+                          mouseCursor: SystemMouseCursors.click,
+                          onTap: _reset,
+                          child: Center(
+                            child: Text(
+                              "Play Again",
+                              style: TextStyle(
+                                fontSize: 60 * RelSize(context).pixel(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0 * RelSize(context).pixel()),
+                      child: Ink(
+                        height: 100 * RelSize(context).pixel(),
+                        width: 300 * RelSize(context).pixel(),
+                        color: Colors.grey.shade700,
+                        child: InkWell(
+                          hoverColor: Colors.grey,
+                          mouseCursor: SystemMouseCursors.click,
+                          onTap: _toggleAI,
+                          child: Center(
+                            child: Text(
+                              "AI Move",
+                              style: TextStyle(
+                                fontSize: 60 * RelSize(context).pixel(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 }
@@ -188,13 +300,15 @@ class Cell extends StatefulWidget {
   final int value;
   final int x;
   final int y;
+  final double size;
   const Cell(
       {Key? key,
       required this.reveal,
       required this.value,
       required this.toggleFlag,
       required this.x,
-      required this.y})
+      required this.y,
+      required this.size})
       : super(key: key);
 
   @override
@@ -218,9 +332,7 @@ class _CellState extends State<Cell> {
   };
 
   Map<int, Widget?> icons = {
-    -3: const Icon(Icons.flag),
     -2: null,
-    -1: const Icon(Icons.circle),
     0: null,
   };
 
@@ -235,13 +347,27 @@ class _CellState extends State<Cell> {
   @override
   void initState() {
     super.initState();
-    for (int i = 1; i < 9; i++) {
-      icons.addAll({i: Text(i.toString())});
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    double dim = widget.size * 3 / 4;
+    for (int i = 1; i < 9; i++) {
+      icons[i] = Text(
+        i.toString(),
+        style: TextStyle(
+          fontSize: dim,
+        ),
+      );
+    }
+    icons[-3] = Icon(
+      Icons.flag,
+      size: dim,
+    );
+    icons[-1] = Icon(
+      Icons.circle,
+      size: dim,
+    );
     return GestureDetector(
       onLongPress: _toggleFlag,
       onSecondaryTap: _toggleFlag,
@@ -249,6 +375,8 @@ class _CellState extends State<Cell> {
         padding: EdgeInsets.all(RelSize(context).pixel()),
         child: Ink(
           color: colors[widget.value],
+          width: widget.size,
+          height: widget.size,
           child: InkWell(
             hoverColor: widget.value == -2 ? Colors.grey : colors[widget.value],
             mouseCursor: widget.value == -2 ? SystemMouseCursors.click : null,
