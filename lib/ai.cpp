@@ -17,26 +17,6 @@ struct Board
     bool firstMove = true;
     bool **board = nullptr;
     int **revealed = nullptr;
-
-    Board();
-
-    Board(int width, int height, int mines)
-    {
-        this->width = width;
-        this->height = height;
-        this->mines = mines;
-        remaining = width * height;
-        board = new bool *[height];
-        for (int i = 0; i < height; i++)
-            board[i] = new bool[width];
-        revealed = new int *[height];
-        for (int i = 0; i < height; i++)
-        {
-            revealed[i] = new int[width];
-            for (int j = 0; j < width; j++)
-                revealed[i][j] = -2;
-        }
-    }
 } board;
 
 bool isPosValid(int x, int y)
@@ -110,17 +90,11 @@ int val(int x, int y)
             }
         }
     }
-    return val;
-}
-
-int val(int x, int y)
-{
-    int value = val(x, y);
     if (board.revealed[x][y] == -2)
         board.remaining--;
-    board.revealed[x][y] = value;
+    board.revealed[x][y] = val;
     board.firstMove = false;
-    return value;
+    return val;
 }
 
 // AI
