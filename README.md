@@ -1,4 +1,4 @@
-# minesweeper
+# Mines
 
 A new Flutter project.
 
