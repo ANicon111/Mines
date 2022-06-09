@@ -137,159 +137,172 @@ class _MineState extends State<Mine> {
                 ),
         ],
       ),
-      body: settingsOpen
-          ? Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 100 * RelSize(context).pixel(),
-                    child: TextFormField(
-                      decoration: const InputDecoration(label: Text("Width:")),
-                      onChanged: (val) {
-                        setState(() {
-                          width = int.tryParse(val) ?? width;
-                        });
-                      },
-                      initialValue: width.toString(),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                    ),
+      body: SingleChildScrollView(
+        child: InteractiveViewer(
+          maxScale: 10,
+          child: settingsOpen
+              ? Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 100 * RelSize(context).pixel(),
+                        child: TextFormField(
+                          decoration:
+                              const InputDecoration(label: Text("Width:")),
+                          onChanged: (val) {
+                            setState(() {
+                              width = int.tryParse(val) ?? width;
+                            });
+                          },
+                          initialValue: width.toString(),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 100 * RelSize(context).pixel(),
+                        child: TextFormField(
+                          decoration:
+                              const InputDecoration(label: Text("Height:")),
+                          onChanged: (val) {
+                            setState(() {
+                              height = int.tryParse(val) ?? height;
+                            });
+                          },
+                          initialValue: height.toString(),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 100 * RelSize(context).pixel(),
+                        child: TextFormField(
+                          decoration:
+                              const InputDecoration(label: Text("Mines:")),
+                          onChanged: (val) {
+                            setState(() {
+                              mines = int.tryParse(val) ?? mines;
+                            });
+                          },
+                          initialValue: mines.toString(),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                  SizedBox(
-                    width: 100 * RelSize(context).pixel(),
-                    child: TextFormField(
-                      decoration: const InputDecoration(label: Text("Height:")),
-                      onChanged: (val) {
-                        setState(() {
-                          height = int.tryParse(val) ?? height;
-                        });
-                      },
-                      initialValue: height.toString(),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 100 * RelSize(context).pixel(),
-                    child: TextFormField(
-                      decoration: const InputDecoration(label: Text("Mines:")),
-                      onChanged: (val) {
-                        setState(() {
-                          mines = int.tryParse(val) ?? mines;
-                        });
-                      },
-                      initialValue: mines.toString(),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
+                )
+              : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.flag,
-                      size: 50 * RelSize(context).pixel(),
-                    ),
-                    Text(
-                      (board.mines - board.flags).toString(),
-                      style: TextStyle(fontSize: 50 * RelSize(context).pixel()),
-                    ),
-                    Icon(
-                      Icons.square,
-                      size: 50 * RelSize(context).pixel(),
-                      color: Colors.grey,
-                    ),
-                    Text(
-                      (board.remaining - (board.flags > 0 ? board.flags : 0))
-                          .toString(),
-                      style: TextStyle(fontSize: 50 * RelSize(context).pixel()),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: List.generate(
-                    height,
-                    (x) => Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.flag,
+                          size: 50 * RelSize(context).pixel(),
+                        ),
+                        Text(
+                          (board.mines - board.flags).toString(),
+                          style: TextStyle(
+                              fontSize: 50 * RelSize(context).pixel()),
+                        ),
+                        Icon(
+                          Icons.square,
+                          size: 50 * RelSize(context).pixel(),
+                          color: Colors.grey,
+                        ),
+                        Text(
+                          (board.remaining -
+                                  (board.flags > 0 ? board.flags : 0))
+                              .toString(),
+                          style: TextStyle(
+                              fontSize: 50 * RelSize(context).pixel()),
+                        ),
+                      ],
+                    ),
+                    Column(
                       children: List.generate(
-                        width,
-                        (y) => Cell(
-                          size: RelSize(context).pixel() *
-                              640 /
-                              (width > height ? width : height),
-                          reveal: _reveal,
-                          value: board.revealed[x][y],
-                          toggleFlag: _toggleFlag,
-                          x: x,
-                          y: y,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0 * RelSize(context).pixel()),
-                      child: Ink(
-                        height: 100 * RelSize(context).pixel(),
-                        width: 300 * RelSize(context).pixel(),
-                        color: Colors.grey.shade700,
-                        child: InkWell(
-                          hoverColor: Colors.grey,
-                          mouseCursor: SystemMouseCursors.click,
-                          onTap: _reset,
-                          child: Center(
-                            child: Text(
-                              "Play Again",
-                              style: TextStyle(
-                                fontSize: 60 * RelSize(context).pixel(),
-                              ),
+                        height,
+                        (x) => Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            width,
+                            (y) => Cell(
+                              size: RelSize(context).pixel() *
+                                  640 /
+                                  (width > height ? width : height),
+                              reveal: _reveal,
+                              value: board.revealed[x][y],
+                              toggleFlag: _toggleFlag,
+                              x: x,
+                              y: y,
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0 * RelSize(context).pixel()),
-                      child: Ink(
-                        height: 100 * RelSize(context).pixel(),
-                        width: 300 * RelSize(context).pixel(),
-                        color: Colors.grey.shade700,
-                        child: InkWell(
-                          hoverColor: Colors.grey,
-                          mouseCursor: SystemMouseCursors.click,
-                          onTap: _toggleAI,
-                          child: Center(
-                            child: Text(
-                              "AI Move",
-                              style: TextStyle(
-                                fontSize: 60 * RelSize(context).pixel(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding:
+                              EdgeInsets.all(8.0 * RelSize(context).pixel()),
+                          child: Ink(
+                            height: 100 * RelSize(context).pixel(),
+                            width: 300 * RelSize(context).pixel(),
+                            color: Colors.grey.shade700,
+                            child: InkWell(
+                              hoverColor: Colors.grey,
+                              mouseCursor: SystemMouseCursors.click,
+                              onTap: _reset,
+                              child: Center(
+                                child: Text(
+                                  "Play Again",
+                                  style: TextStyle(
+                                    fontSize: 60 * RelSize(context).pixel(),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
+                        Padding(
+                          padding:
+                              EdgeInsets.all(8.0 * RelSize(context).pixel()),
+                          child: Ink(
+                            height: 100 * RelSize(context).pixel(),
+                            width: 300 * RelSize(context).pixel(),
+                            color: Colors.grey.shade700,
+                            child: InkWell(
+                              hoverColor: Colors.grey,
+                              mouseCursor: SystemMouseCursors.click,
+                              onTap: _toggleAI,
+                              child: Center(
+                                child: Text(
+                                  "AI Move",
+                                  style: TextStyle(
+                                    fontSize: 60 * RelSize(context).pixel(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+        ),
+      ),
     );
   }
 }
