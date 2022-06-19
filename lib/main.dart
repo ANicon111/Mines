@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:minesweeper/ai.dart';
-import 'package:minesweeper/board.dart';
-import 'package:minesweeper/definitions.dart';
+import 'package:mines/ai.dart';
+import 'package:mines/board.dart';
+import 'package:mines/definitions.dart';
 
 void main() {
   runApp(const MyApp());
@@ -113,7 +113,7 @@ class _MineState extends State<Mine> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Minesweeper"),
+        title: const Text("mines"),
         actions: [
           settingsOpen
               ? IconButton(

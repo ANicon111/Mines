@@ -1,6 +1,6 @@
 {
-    "name": "minesweeper",
-    "short_name": "minesweeper",
+    "name": "mines",
+    "short_name": "mines",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

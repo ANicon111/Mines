@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:minesweeper/board.dart';
+import 'package:mines/board.dart';
 
 class AI {
   List<List<double>> moves = [];
