@@ -89,7 +89,7 @@ class _MineState extends State<Mine> {
   }
 
   void _aiMove() {
-    Coords coords = AI(board).getBestMove();
+    Coords coords = Algorithm(board).getBestMove();
     _reveal(coords.x, coords.y);
     setState(() {});
     if (aiEnabled) Timer(const Duration(milliseconds: 10), _aiMove);
@@ -288,7 +288,7 @@ class _MineState extends State<Mine> {
                               onTap: _toggleAI,
                               child: Center(
                                 child: Text(
-                                  "AI Move",
+                                  "Algorithm",
                                   style: TextStyle(
                                     fontSize: 60 * RelSize(context).pixel(),
                                   ),

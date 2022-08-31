@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:mines/board.dart';
 
-class AI {
+class Algorithm {
   List<List<double>> moves = [];
   Board board;
   double unknownK = 0.099;
@@ -75,7 +75,7 @@ class AI {
     }
   }
 
-  AI(this.board) {
+  Algorithm(this.board) {
     moves = List.generate(
         board.height,
         ((i) => List.generate(
